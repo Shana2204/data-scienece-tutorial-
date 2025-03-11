@@ -1,0 +1,26 @@
+# Importing  libraries
+import pandas as pd
+import statsmodels.api as sm
+import numpy as np
+
+# Loading the dataset
+file_path = "Advertising.csv"  
+df = pd.read_csv(file_path)
+
+# Defining independent variables (TV, radio, newspaper) and dependent variable (sales)
+X = df[['TV', 'radio', 'newspaper']]  # Independent variables
+y = df['sales']  # Dependent variable
+
+# Adding a constant term for the intercept in the regression model
+X = sm.add_constant(X)
+
+# Fitting in the multiple linear regression model
+model = sm.OLS(y, X).fit()
+
+# Printing model summary 
+print(model.summary())
+
+# Computing Residual Standard Error (RSE)
+rss = np.sum(model.resid ** 2)  # Residual Sum of Squares
+rse = np.sqrt(rss / (len(df) - len(X.columns)))  # RSE formula
+print(f"Residual Standard Error (RSE): {rse:.2f}")
