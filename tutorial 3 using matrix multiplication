@@ -1,0 +1,31 @@
+# Importing numpy for matrix operations
+import numpy as np  
+
+# Define a 2x2 feature matrix
+X = np.array([[2, 3], [3, 4]])
+
+# Define class labels
+y = np.array([0, 1])  
+
+# Computes the mean of each class
+mean_0 = np.mean(X[y == 0], axis=0)  # Mean of class 0
+mean_1 = np.mean(X[y == 1], axis=0)  # Mean of class 1
+
+# Computes the overall mean of the dataset
+mean_total = np.mean(X, axis=0)
+
+# Computes scatter matrices
+S_W = np.dot((X - mean_total).T, (X - mean_total))  # Within-class scatter matrix
+S_B = np.dot((mean_0 - mean_1).reshape(-1, 1), (mean_0 - mean_1).reshape(1, -1))  # Between-class scatter matrix
+
+# Computes eigenvalues and eigenvectors
+eigvals, eigvecs = np.linalg.eig(np.linalg.inv(S_W).dot(S_B))
+
+# It will get the eigenvector corresponding to the largest eigenvalue
+lda_vector = eigvecs[:, np.argmax(eigvals)]
+
+# Projects data onto the new LDA axis
+X_lda = X.dot(lda_vector)
+
+# Prints LDA projection values
+print("Projected Data onto LDA Axis:\n", X_lda)
