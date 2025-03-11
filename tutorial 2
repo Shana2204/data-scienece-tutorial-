@@ -1,0 +1,64 @@
+# Importing necessary libraries
+import numpy as np  # For numerical operations
+import pandas as pd  # For data manipulation
+import matplotlib.pyplot as plt  # For plotting graphs
+import seaborn as sns  # For better visualization
+from sklearn.model_selection import train_test_split  # For splitting the dataset
+from sklearn.linear_model import LogisticRegression  # Logistic Regression model
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix  # Evaluation metrics
+
+# The dataset will have two exam scores as features and an admission decision as the target (1 = Admitted, 0 = Not Admitted)
+np.random.seed(42)  # Ensures reproducibility
+data_size = 100  # Number of students
+
+exam1 = np.random.randint(40, 100, size=data_size)  # Random scores for Exam 1 
+exam2 = np.random.randint(30, 100, size=data_size)  # Random scores for Exam 2
+
+# Admission decision (target variable) based on a rule: If avg exam score > 65, admit the student
+admission = (0.5 * exam1 + 0.5 * exam2 > 65).astype(int)
+
+# Creating a DataFrame
+df = pd.DataFrame({'Exam 1': exam1, 'Exam 2': exam2, 'Admitted': admission})
+
+print(df.head())  # Print first few rows
+
+# Visualizing the data
+plt.figure(figsize=(8,6))
+sns.scatterplot(x=df['Exam 1'], y=df['Exam 2'], hue=df['Admitted'], palette='coolwarm', s=100)
+plt.xlabel("Exam 1 Score")
+plt.ylabel("Exam 2 Score")
+plt.title("Exam Scores vs Admission Decision")
+plt.legend(title="Admitted", labels=["Not Admitted", "Admitted"])
+plt.show()
+
+#  Spliting data into training and testing sets
+X = df[['Exam 1', 'Exam 2']]  # Independent variables (features)
+y = df['Admitted']  # Dependent variable (target)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)  # 80% train, 20% test
+
+# Training a logistic regression model
+model = LogisticRegression()  # Initialize logistic regression model
+model.fit(X_train, y_train)  # Train the model
+
+#  Make predictions
+y_pred = model.predict(X_test)  # Predict on test data
+
+# Evaluate the model
+accuracy = accuracy_score(y_test, y_pred)  # Compute accuracy
+print(f"Model Accuracy: {accuracy:.2f}")  # Prints accuracy
+
+print("\nClassification Report:\n", classification_report(y_test, y_pred))  # Prints classification report
+print("\nConfusion Matrix:\n", confusion_matrix(y_test, y_pred))  # Prints confusion matrix
+
+# Predicting values for unknown data points
+unknown_data = np.array([[80, 75], [50, 45], [70, 65]])  # New students with different exam scores
+predicted_values = model.predict(unknown_data)  # Predict admission decision
+
+print("\nPredicted Admission Decisions for Unknown Data:")
+for i, (score1, score2) in enumerate(unknown_data):
+    print(f"Exam 1: {score1}, Exam 2: {score2} --> Admitted: {predicted_values[i]}")
+
+# Checks how coefficients change when data is modified
+print("\nLogistic Regression Coefficients:", model.coef_)  # Prints coefficients
+print("Intercept:", model.intercept_)  # Prints intercept
