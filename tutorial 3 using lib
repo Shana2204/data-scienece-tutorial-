@@ -1,0 +1,20 @@
+# Importing necessary libraries
+import numpy as np  # For numerical operations
+import pandas as pd  # For handling data
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis  # LDA from sklearn
+
+# Creates a simple 2x2 matrix dataset (features) and corresponding class labels
+X = np.array([[2, 3], [3, 4]])  # 2x2 matrix with two features
+y = np.array([0, 1])  # Class labels (0 and 1)
+
+# Initializing LDA model
+lda = LinearDiscriminantAnalysis()
+
+# Fits the LDA model with the dataset
+lda.fit(X, y)
+
+# Transforming the input data into LDA space
+X_transformed = lda.transform(X)
+
+# Prints transformed LDA values
+print("Transformed LDA Output:\n", X_transformed)
