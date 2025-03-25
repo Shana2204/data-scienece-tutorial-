@@ -1,0 +1,56 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+def complete_linkage_distance(cluster1, cluster2, distances):
+    max_dist = 0.0
+    for i in cluster1:
+        for j in cluster2:
+            d = distances[i, j]
+            if d > max_dist:
+                max_dist = d
+    return max_dist
+
+def hierarchical_clustering(X, num_clusters):
+    n = X.shape[0]
+    distances = np.zeros((n, n))
+    for i in range(n):
+        for j in range(i + 1, n):
+            distances[i, j] = np.linalg.norm(X[i] - X[j])
+            distances[j, i] = distances[i, j]
+    
+    clusters = [[i] for i in range(n)]
+    
+    while len(clusters) > num_clusters:
+        min_dist = np.inf
+        merge_idx = (-1, -1)
+        for i in range(len(clusters)):
+            for j in range(i + 1, len(clusters)):
+                d = complete_linkage_distance(clusters[i], clusters[j], distances)
+                if d < min_dist:
+                    min_dist = d
+                    merge_idx = (i, j)
+        i, j = merge_idx
+        new_cluster = clusters[i] + clusters[j]
+        clusters = [clusters[k] for k in range(len(clusters)) if k not in (i, j)]
+        clusters.append(new_cluster)
+    return clusters
+
+# Generate some sample data
+np.random.seed(42)
+X = np.vstack((np.random.randn(20, 2) + np.array([5, 5]),
+               np.random.randn(20, 2) + np.array([-5, -5]),
+               np.random.randn(20, 2) + np.array([5, -5])))
+
+# Perform hierarchical clustering with complete linkage to get 3 clusters
+clusters = hierarchical_clustering(X, num_clusters=3)
+print("Clusters (indices of points):")
+for idx, cluster in enumerate(clusters):
+    print(f"Cluster {idx+1}: {cluster}")
+
+# Plot the clusters
+colors = ['r', 'g', 'b']
+for idx, cluster in enumerate(clusters):
+    pts = X[cluster]
+    plt.scatter(pts[:, 0], pts[:, 1], color=colors[idx])
+plt.title("Hierarchical Clustering with Complete Linkage")
+plt.show()
